@@ -1,0 +1,43 @@
+﻿<Page
+    x:Class="IlanCurves.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:IlanCurves"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    >
+
+    <Page.Resources>
+    </Page.Resources>
+
+    <Page.DataContext>
+        <local:MainViewModel />
+    </Page.DataContext>
+    
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel>
+            <controls:DataGrid x:Name="dataGrid" AutoGenerateColumns="False" ItemsSource="{Binding Samples}" Height="300">
+                <controls:DataGrid.Columns>
+                    <controls:DataGridTextColumn Header="Day"
+                                             Binding="{Binding DayNumber}"/>
+                    <controls:DataGridTextColumn Header="Value"
+                                             Binding="{Binding Value}"/>
+                </controls:DataGrid.Columns>
+            </controls:DataGrid>
+            <Button Content="Add Sample" Click="AddSampleClicked"/>
+            <CheckBox x:Name="ShowCurve" Content="Show curve" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" IsChecked="True" />
+            <CheckBox x:Name="ShowLinear" Content="Show linear" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" />
+            <CheckBox x:Name="ShowControlPoints" Content="Show control points" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" IsChecked="True" />
+            <CheckBox x:Name="ShowTestPoints" Content="Show sample points" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" IsChecked="True" />
+        </StackPanel>
+        <Border Grid.Column="1" Background="#FFECECEC" >
+            <Canvas x:Name="canvas" SizeChanged="canvas_SizeChanged" PointerMoved="canvas_PointerMoved" />
+        </Border>
+    </Grid>
+</Page>
