@@ -51,7 +51,8 @@ namespace IlanCurves
                 Samples.Add(new GraphSample { DayNumber = 4, Value = 18 });
                 Samples.Add(new GraphSample { DayNumber = 7, Value = 22 });
                 Samples.Add(new GraphSample { DayNumber = 10, Value = 31 });
-                Samples.Add(new GraphSample { DayNumber = 20, Value = 68 });
+                Samples.Add(new GraphSample { DayNumber = 7, Value = 25 });
+                Samples.Add(new GraphSample { DayNumber = 11, Value = 20 });
             }
         }
 

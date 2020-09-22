@@ -37,7 +37,7 @@ namespace IlanCurves
         };
 
         private Line trackingLine;
-        private Ellipse trackingBubble;
+        private readonly List<Ellipse> trackingBubbles = new List<Ellipse>();
 
         public MainPage()
         {
@@ -110,7 +110,7 @@ namespace IlanCurves
             var verticalExtent = maxY;
 
             trackingLine = null;
-            trackingBubble = null;
+            trackingBubbles.Clear();
             canvas.Children.Clear();
             
             // Scale all points by these values
@@ -243,7 +243,7 @@ namespace IlanCurves
                     });
                 }
 
-                var path1 = new Windows.UI.Xaml.Shapes.Path
+                canvas.Children.Add(new Path
                 {
                     Stroke = new SolidColorBrush(Windows.UI.Colors.Black),
                     StrokeThickness = 1,
@@ -263,11 +263,11 @@ namespace IlanCurves
                             }
                         }
                     }
-                };
-
-                canvas.Children.Add(path1);
+                });
             }
 
+            // Draw test points along the curve at an X interval ranging from the minimum X to the maximum. 
+            //  TODO: This should be changed to be based on the extents of the curve rather than on the extents of the samples
             if ((bool)ShowTestPoints.IsChecked)
             {
                 var curve = ToPointCollection(samples.SplineInterpolate());
@@ -277,20 +277,23 @@ namespace IlanCurves
                     if (ys.Count() == 0)
                         continue;
 
-                    var y = canvas.ActualHeight - (ys.First() * scaleY + translateY);
-                    var x = n * scaleX + translateX;
+                    foreach (var yVal in ys)
+                    {
+                        var y = canvas.ActualHeight - (yVal * scaleY + translateY);
+                        var x = n * scaleX + translateX;
 
-                    canvas.Children.Add(
-                        new Ellipse
-                        {
-                            Width = LittleBubbleSize,
-                            Height = LittleBubbleSize,
-                            Margin = new Thickness(x - LittleBubbleSize / 2, y - LittleBubbleSize / 2, 0, 0),
-                            StrokeThickness = 1,
-                            Stroke = new SolidColorBrush(Windows.UI.Colors.Black),
-                            Fill = new SolidColorBrush(Windows.UI.Colors.Green)
-                        }
-                        );
+                        canvas.Children.Add(
+                            new Ellipse
+                            {
+                                Width = LittleBubbleSize,
+                                Height = LittleBubbleSize,
+                                Margin = new Thickness(x - LittleBubbleSize / 2, y - LittleBubbleSize / 2, 0, 0),
+                                StrokeThickness = 1,
+                                Stroke = new SolidColorBrush(Windows.UI.Colors.Black),
+                                Fill = new SolidColorBrush(Windows.UI.Colors.Green)
+                            }
+                            );
+                    }
                 }
             }
         }
@@ -303,9 +306,6 @@ namespace IlanCurves
 
         private void canvas_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
-            // this is super slow. there must be a better way
-            var pt = e.GetCurrentPoint(canvas);
-
             var samples = SamplesPoints;
 
             var minX = samples.Select(x => x.X).Min();
@@ -324,6 +324,8 @@ namespace IlanCurves
             var translateX = (canvas.ActualWidth - (horizontalExtent * scaleX)) / 2.0;
             var translateY = (canvas.ActualHeight - (verticalExtent * scaleY)) / 2.0;
 
+
+            var pt = e.GetCurrentPoint(canvas);
 
             // Draw a line showing the X position of the mouse.
             if (trackingLine == null)
@@ -347,30 +349,36 @@ namespace IlanCurves
 
             var xPos = (pt.Position.X - translateX) / scaleX;
 
-            // Draw a bubble on the Y intersect of the lowest value. This should be extended to show all Y values a the intersection
+            // Draw a bubble for each Y intersect for the current X
             var ys = ToPointCollection(samples.SplineInterpolate()).FindYForX(xPos);
-            if (ys.Count() > 0)
-            {
-                var minYValue = ys.Min();
-                var p = new Point(xPos * scaleX + translateX, canvas.ActualHeight - minYValue * scaleY - translateY);
 
-                if (trackingBubble == null)
+            while (ys.Count() > trackingBubbles.Count)
+            {
+                var trackingBubble = new Ellipse
                 {
-                    trackingBubble = new Ellipse
-                    {
-                        Width = BubbleSize,
-                        Height = BubbleSize,
-                        Margin = new Thickness(p.X - BubbleSize / 2, p.Y - BubbleSize / 2, 0, 0),
-                        StrokeThickness = 1,
-                        Stroke = new SolidColorBrush(Windows.UI.Colors.Black),
-                        Fill = new SolidColorBrush(Windows.UI.Colors.Green),
-                    };
-                    canvas.Children.Add(trackingBubble);
-                }
-                else
-                {
-                    trackingBubble.Margin = new Thickness(p.X - BubbleSize / 2, p.Y - BubbleSize / 2, 0, 0);
-                }
+                    Width = BubbleSize,
+                    Height = BubbleSize,
+                    StrokeThickness = 1,
+                    Stroke = new SolidColorBrush(Windows.UI.Colors.Black),
+                    Fill = new SolidColorBrush(Windows.UI.Colors.Green),
+                };
+                trackingBubbles.Add(trackingBubble);
+                canvas.Children.Add(trackingBubble);
+            }
+
+            while(ys.Count() < trackingBubbles.Count)
+            {
+                var last = trackingBubbles.Last();
+                canvas.Children.Remove(last);
+                trackingBubbles.Remove(last);
+            }
+
+            int index = 0;
+            foreach(var yVal in ys)
+            {
+                var p = new Point(xPos * scaleX + translateX, canvas.ActualHeight - yVal * scaleY - translateY);
+
+                trackingBubbles[index++].Margin = new Thickness(p.X - BubbleSize / 2, p.Y - BubbleSize / 2, 0, 0);
             }
         }
 

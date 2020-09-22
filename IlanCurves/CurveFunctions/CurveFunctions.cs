@@ -110,7 +110,6 @@ namespace IlanCurves.CurveFunctions
         /// <returns>A two dimension array containing first and second control points</returns>
         /// 
         /// This function is a direct port of the code presented on https://www.particleincell.com/2012/bezier-splines/
-        /// TODO: Eliminate lists and use arrays instead.
         /// TODO: Consider using matrices as provided by C#
         private static double[][] ComputeControlPoints(double[] K)
         {
@@ -120,13 +119,13 @@ namespace IlanCurves.CurveFunctions
             var a = new double[K.Length];
             var b = new double[K.Length];
             var c = new double[K.Length];
-            var r = new double[K.Length];
+            var rightHandSide = new double[K.Length];
 
             // left most segment
             a[0] = 0;
             b[0] = 2;
             c[0] = 1;
-            r[0] = K[0] + 2 * K[1];
+            rightHandSide[0] = K[0] + 2 * K[1];
 
             // internal segments
             for (var i = 1; i < n - 1; i++)
@@ -134,29 +133,29 @@ namespace IlanCurves.CurveFunctions
                 a[i] = 1;
                 b[i] = 4;
                 c[i] = 1;
-                r[i] = 4 * K[i] + 2 * K[i + 1];
+                rightHandSide[i] = 4 * K[i] + 2 * K[i + 1];
             }
 
             // right segment
             a[n - 1] = 2;
             b[n - 1] = 7;
             c[n - 1] = 0;
-            r[n - 1] = 8 * K[n - 1] + K[n];
+            rightHandSide[n - 1] = 8 * K[n - 1] + K[n];
 
             // solves Ax=b with the Thomas algorithm (from Wikipedia)
             for (var i = 1; i < n; i++)
             {
                 var m = a[i] / b[i - 1];
-                b[i] = b[i] - m * c[i - 1];
-                r[i] = r[i] - m * r[i - 1];
+                b[i] -= m * c[i - 1];
+                rightHandSide[i] = rightHandSide[i] - m * rightHandSide[i - 1];
             }
 
             var p1 = new double[K.Length];
             var p2 = new double[K.Length];
 
-            p1[n - 1] = r[n - 1] / b[n - 1];
+            p1[n - 1] = rightHandSide[n - 1] / b[n - 1];
             for (var i = n - 2; i >= 0; --i)
-                p1[i] = (r[i] - c[i] * p1[i + 1]) / b[i];
+                p1[i] = (rightHandSide[i] - c[i] * p1[i + 1]) / b[i];
 
             /*we have p1, now compute p2*/
             for (var i = 0; i < n - 1; i++)
