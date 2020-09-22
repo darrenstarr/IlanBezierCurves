@@ -16,13 +16,13 @@
         <local:MainViewModel />
     </Page.DataContext>
     
-    <Grid>
+    <Grid Margin="8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <StackPanel>
-            <controls:DataGrid x:Name="dataGrid" AutoGenerateColumns="False" ItemsSource="{Binding Samples}" Height="300">
+            <controls:DataGrid x:Name="dataGrid" AutoGenerateColumns="False" ItemsSource="{Binding Samples}" Height="300" CellEditEnded="dataGrid_CellEditEnded" SelectionChanged="dataGrid_SelectionChanged">
                 <controls:DataGrid.Columns>
                     <controls:DataGridTextColumn Header="Day"
                                              Binding="{Binding DayNumber}"/>
@@ -30,7 +30,29 @@
                                              Binding="{Binding Value}"/>
                 </controls:DataGrid.Columns>
             </controls:DataGrid>
-            <Button Content="Add Sample" Click="AddSampleClicked"/>
+            <Button x:Name="RemoveSample" HorizontalAlignment="Right" Grid.Row="3" Grid.Column="1" Content="Remove" Click="RemoveItemClicked" IsEnabled="False"/>
+
+            <Border BorderBrush="Black" Background="#FFE6E6E6">
+                <Grid Padding="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center">New sample</TextBlock>
+                    <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center">Day</TextBlock>
+                    <TextBox Grid.Row="1" Grid.Column="1" TextAlignment="Right" Text="{Binding NewSampleDay, Mode=TwoWay}"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center">Value</TextBlock>
+                    <TextBox  Grid.Row="2" Grid.Column="1" TextAlignment="Right" Text="{Binding NewSampleValue, Mode=TwoWay}"/>
+                    <Button HorizontalAlignment="Right" Grid.Row="3" Grid.Column="1" Content="Add" Click="AddSampleClicked"/>
+
+                </Grid>
+            </Border>
             <CheckBox x:Name="ShowCurve" Content="Show curve" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" IsChecked="True" />
             <CheckBox x:Name="ShowLinear" Content="Show linear" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" />
             <CheckBox x:Name="ShowControlPoints" Content="Show control points" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" IsChecked="True" />

@@ -1,4 +1,5 @@
 ﻿using IlanCurves.CurveFunctions;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +42,34 @@ namespace IlanCurves
         public MainPage()
         {
             InitializeComponent();
+            PaintCanvas();
+        }
+
+        private void AddSampleClicked(object sender, RoutedEventArgs e)
+        {
+            var viewModel = DataContext as MainViewModel;
+
+            var newSample = new GraphSample
+            {
+                DayNumber = viewModel.NewSampleDay,
+                Value = viewModel.NewSampleValue
+            };
+
+            viewModel.AddSample(newSample);
+
+            viewModel.NewSampleDay = 0;
+            viewModel.NewSampleValue = 0.0;
+
+            PaintCanvas();
+        }
+
+        private void canvas_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            PaintCanvas();
+        }
+
+        private void dataGrid_CellEditEnded(object sender, DataGridCellEditEndedEventArgs e)
+        {
             PaintCanvas();
         }
 
@@ -266,16 +295,6 @@ namespace IlanCurves
             }
         }
 
-        private void AddSampleClicked(object sender, RoutedEventArgs e)
-        {
-            (DataContext as MainViewModel).Samples.Add(new GraphSample());
-        }
-
-        private void canvas_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            PaintCanvas();
-        }
-
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
         {
             PaintCanvas();
@@ -353,6 +372,27 @@ namespace IlanCurves
                     trackingBubble.Margin = new Thickness(p.X - BubbleSize / 2, p.Y - BubbleSize / 2, 0, 0);
                 }
             }
+        }
+
+        private void dataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var grid = sender as DataGrid;
+
+            RemoveSample.IsEnabled = grid.SelectedItems.Count != 0;
+        }
+
+        private void RemoveItemClicked(object sender, RoutedEventArgs e)
+        {
+            var viewModel = DataContext as MainViewModel;
+
+            var toDelete = new List<GraphSample>();
+            foreach (var item in dataGrid.SelectedItems)
+                toDelete.Add(item as GraphSample);
+
+            foreach (var item in toDelete)
+                viewModel.Samples.Remove(item);
+
+            PaintCanvas();
         }
     }
 }

@@ -6,3 +6,7 @@ It implements the mathematics to solve for Y from X for a given Bezier curve. It
 terribly hard to optimize the code. The math is sound and is documented.
 
 The license for this is... plain old public domain. Just use it however you will.
+
+## Changes
+
+* Can now add and remove samples to be interpolated
