@@ -119,8 +119,12 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BezierView.xaml.cs">
+      <DependentUpon>BezierView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CurveFunctions\CurveFunctions.cs" />
     <Compile Include="GraphSample.cs" />
+    <Compile Include="GraphSampleToCurveConverter.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
@@ -147,6 +151,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="BezierView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

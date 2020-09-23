@@ -10,6 +10,7 @@
     >
 
     <Page.Resources>
+        <local:GraphSampleToCurveConverter x:Key="SampleConverter" />
     </Page.Resources>
 
     <Page.DataContext>
@@ -22,7 +23,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <StackPanel>
-            <controls:DataGrid x:Name="dataGrid" AutoGenerateColumns="False" ItemsSource="{Binding Samples}" Height="300" CellEditEnded="dataGrid_CellEditEnded" SelectionChanged="dataGrid_SelectionChanged">
+            <controls:DataGrid x:Name="dataGrid" AutoGenerateColumns="False" ItemsSource="{Binding Samples}" Height="300" CellEditEnded="DataGrid_CellEditEnded" SelectionChanged="DataGrid_SelectionChanged">
                 <controls:DataGrid.Columns>
                     <controls:DataGridTextColumn Header="Day"
                                              Binding="{Binding DayNumber}"/>
@@ -53,13 +54,14 @@
 
                 </Grid>
             </Border>
-            <CheckBox x:Name="ShowCurve" Content="Show curve" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" IsChecked="True" />
-            <CheckBox x:Name="ShowLinear" Content="Show linear" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" />
-            <CheckBox x:Name="ShowControlPoints" Content="Show control points" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" IsChecked="True" />
-            <CheckBox x:Name="ShowTestPoints" Content="Show sample points" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" IsChecked="True" />
+            <CheckBox x:Name="ShowCurve" Content="Show curve" Checked="ShowCurve_Checked" Unchecked="ShowCurve_Checked"  IsChecked="True"/>
+            <CheckBox x:Name="ShowLinear" Content="Show linear" Checked="ShowLinear_Checked" Unchecked="ShowLinear_Checked" />
+            <CheckBox x:Name="ShowControlPoints" Content="Show control points" Checked="ShowControlPoints_Checked" Unchecked="ShowControlPoints_Checked" IsChecked="True" />
         </StackPanel>
         <Border Grid.Column="1" Background="#FFECECEC" >
-            <Canvas x:Name="canvas" SizeChanged="canvas_SizeChanged" PointerMoved="canvas_PointerMoved" />
+            <Grid>
+                <local:BezierView x:Name="bezierView" ControlPoints="{Binding Samples, Converter={StaticResource SampleConverter}}" />
+            </Grid>
         </Border>
     </Grid>
 </Page>
