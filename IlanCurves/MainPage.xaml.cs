@@ -1,4 +1,4 @@
-﻿using IlanCurves.CurveFunctions;
+﻿using IlanCurves.Geometry;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System.Collections.Generic;
 using Windows.Foundation;
@@ -60,11 +60,6 @@ namespace IlanCurves
             UpdateBezierView();
         }
 
-        private void CheckBox_Checked(object sender, RoutedEventArgs e)
-        {
-            UpdateBezierView();
-        }
-
         private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var grid = sender as DataGrid;
@@ -102,6 +97,42 @@ namespace IlanCurves
         {
             if(bezierView != null)
                 bezierView.ShowControlPoints = (bool)ShowControlPoints.IsChecked;
+        }
+
+        private void ShowXIntersects_Checked(object sender, RoutedEventArgs e)
+        {
+            if (bezierView != null)
+                bezierView.ShowMouseXIntercepts = (bool)ShowXIntersect.IsChecked;
+        }
+
+        private void ShowYIntersects_Checked(object sender, RoutedEventArgs e)
+        {
+            if (bezierView != null)
+                bezierView.ShowMouseYIntercepts = (bool)ShowYIntersect.IsChecked;
+        }
+
+        private void ShowGrid_Checked(object sender, RoutedEventArgs e)
+        {
+            if (bezierView != null)
+                bezierView.ShowGrid = (bool)ShowGrid.IsChecked;
+        }
+
+        private void ShowMouseTrackingLines_Checked(object sender, RoutedEventArgs e)
+        {
+            if (bezierView != null)
+                bezierView.MouseTracking = (bool)ShowMouseTrackingLines.IsChecked;
+        }
+
+        private void ShowShortestPath_Checked(object sender, RoutedEventArgs e)
+        {
+            if (bezierView != null)
+                bezierView.ShowShortestPath = (bool)ShowShortestPath.IsChecked;
+        }
+
+        private void ShowPointsAlongCurve_Checked(object sender, RoutedEventArgs e)
+        {
+            if (bezierView != null)
+                bezierView.ShowPointsAlongCurve = (bool)ShowPointsAlongCurve.IsChecked;
         }
     }
 }

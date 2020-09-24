@@ -1,4 +1,4 @@
-﻿using IlanCurves.CurveFunctions;
+﻿using IlanCurves.Geometry;
 using System;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;

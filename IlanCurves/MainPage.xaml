@@ -54,9 +54,15 @@
 
                 </Grid>
             </Border>
+            <CheckBox x:Name="ShowGrid" Content="Show grid" Checked="ShowGrid_Checked" Unchecked="ShowGrid_Checked"  IsChecked="True"/>
             <CheckBox x:Name="ShowCurve" Content="Show curve" Checked="ShowCurve_Checked" Unchecked="ShowCurve_Checked"  IsChecked="True"/>
             <CheckBox x:Name="ShowLinear" Content="Show linear" Checked="ShowLinear_Checked" Unchecked="ShowLinear_Checked" />
             <CheckBox x:Name="ShowControlPoints" Content="Show control points" Checked="ShowControlPoints_Checked" Unchecked="ShowControlPoints_Checked" IsChecked="True" />
+            <CheckBox x:Name="ShowXIntersect" Content="Show X Intersects" Checked="ShowXIntersects_Checked" Unchecked="ShowXIntersects_Checked" IsChecked="True" />
+            <CheckBox x:Name="ShowYIntersect" Content="Show Y Intersects" Checked="ShowYIntersects_Checked" Unchecked="ShowYIntersects_Checked" IsChecked="True" />
+            <CheckBox x:Name="ShowMouseTrackingLines" Content="Show Mouse Tracking Lines" Checked="ShowMouseTrackingLines_Checked" Unchecked="ShowMouseTrackingLines_Checked" IsChecked="True" />
+            <CheckBox x:Name="ShowShortestPath" Content="Show Shortest Path" Checked="ShowShortestPath_Checked" Unchecked="ShowShortestPath_Checked" IsChecked="True" />
+            <CheckBox x:Name="ShowPointsAlongCurve" Content="Show Points Along Curve" Checked="ShowPointsAlongCurve_Checked" Unchecked="ShowPointsAlongCurve_Checked" IsChecked="True" />
         </StackPanel>
         <Border Grid.Column="1" Background="#FFECECEC" >
             <Grid>

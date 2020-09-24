@@ -122,7 +122,9 @@
     <Compile Include="BezierView.xaml.cs">
       <DependentUpon>BezierView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CurveFunctions\CurveFunctions.cs" />
+    <Compile Include="Geometry\Clipping.cs" />
+    <Compile Include="Geometry\CurveFunctions.cs" />
+    <Compile Include="Geometry\Vector2.cs" />
     <Compile Include="GraphSample.cs" />
     <Compile Include="GraphSampleToCurveConverter.cs" />
     <Compile Include="MainViewModel.cs" />
@@ -169,6 +171,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.DataGrid">
       <Version>6.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="Win2D.uwp">
+      <Version>1.25.0</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

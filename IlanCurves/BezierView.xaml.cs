@@ -1,4 +1,4 @@
-﻿using IlanCurves.CurveFunctions;
+﻿using IlanCurves.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +24,8 @@ namespace IlanCurves
         private bool showMouseXIntercepts = true;
         private bool showMouseYIntercepts = true;
         private bool showLinear = false;
+        private bool showShortestPath = true;
+        private bool showPointsAlongCurve = true;
 
         private Point graphLowerBounds = new Point(0, 0);
         private Point graphExtents = new Point(1, 1);
@@ -38,10 +40,10 @@ namespace IlanCurves
         private Line MouseTrackingLineX;
         private Line MouseTrackingLineY;
 
-
         private List<Ellipse> MouseXInterceptBubbles = new List<Ellipse>();
         private List<Ellipse> MouseYInterceptBubbles = new List<Ellipse>();
-
+        private Ellipse NearestPointToMouse;
+        private Line NearestPointToMousePin;
         private readonly Windows.UI.Color[] BubbleColors = new Windows.UI.Color[]
         {
                     Windows.UI.Colors.Yellow,
@@ -146,6 +148,28 @@ namespace IlanCurves
             }
         }
 
+
+        public bool ShowShortestPath
+        {
+            get => showShortestPath;
+            set
+            {
+                showShortestPath = value;
+                PaintCanvas();
+            }
+        }
+
+        public bool ShowPointsAlongCurve
+        {
+            get => showPointsAlongCurve;
+            set
+            {
+                showPointsAlongCurve = value;
+                PaintCanvas();
+            }
+        }
+
+
         /// <summary>
         /// Size of the big bubbles on the UI
         /// </summary>
@@ -197,7 +221,7 @@ namespace IlanCurves
         {
             if (invertY)
                 return (canvas.ActualHeight - y - graphOffset.Y) / scale.Y + graphLowerBounds.Y;
-            
+
             return (y - graphOffset.Y) / scale.Y - graphLowerBounds.Y;
         }
 
@@ -210,12 +234,21 @@ namespace IlanCurves
             };
         }
 
+        private Point UnscalePoint(Point p)
+        {
+            return new Point
+            {
+                X = UnscaleX(p.X),
+                Y = UnscaleY(p.Y)
+            };
+        }
+
         private void ScaleControlPoints()
         {
             if (canvas.ActualWidth == 0 || canvas.ActualHeight == 0)
                 return;
 
-            rawControlPointsBounds = CurveFunctions.CurveFunctions.BezierExtents(ControlPoints);
+            rawControlPointsBounds = CurveFunctions.BezierExtents(ControlPoints);
 
             graphLowerBounds.X = rawControlPointsBounds.X < 0 ? Math.Floor(rawControlPointsBounds.X) : 0;
             graphLowerBounds.Y = rawControlPointsBounds.Y < 0 ? Math.Floor(rawControlPointsBounds.Y) : 0;
@@ -277,6 +310,41 @@ namespace IlanCurves
                 PaintControlPoints();
 
             PaintEndPoints();
+
+            if (ShowShortestPath)
+                PaintShortestPath();
+
+            if (ShowPointsAlongCurve)
+                AlternativeCurve();
+        }
+
+        private void AlternativeCurve()
+        {
+            for (var i = 3; i < scaledControlPoints.Count; i += 3)
+            {
+                var p = new PointCollection();
+                p.Add(scaledControlPoints[i - 3]);
+                p.Add(scaledControlPoints[i - 2]);
+                p.Add(scaledControlPoints[i - 1]);
+                p.Add(scaledControlPoints[i]);
+
+                for (double t = 0; t <= 1.0; t += 0.1)
+                {
+                    var F = CurveFunctions.DarrensAlgorithm(t, p);
+
+                    canvas.Children.Add(
+                    new Rectangle
+                    {
+                        Width = 4,
+                        Height = 4,
+                        Margin = new Thickness(F.X - 2, F.Y - 2, 0, 0),
+                        StrokeThickness = 1,
+                        Stroke = new SolidColorBrush(Windows.UI.Colors.LightPink),
+                        Fill = new SolidColorBrush(Windows.UI.Colors.Black)
+                    });
+
+                }
+            }
         }
 
         private void PaintGrid()
@@ -411,7 +479,7 @@ namespace IlanCurves
         private void PaintLinear()
         {
             var points = new PointCollection();
-            for (var t = 0; t < scaledControlPoints.Count; t+=3)
+            for (var t = 0; t < scaledControlPoints.Count; t += 3)
                 points.Add(scaledControlPoints[t]);
 
             canvas.Children.Add(
@@ -445,6 +513,30 @@ namespace IlanCurves
             }
         }
 
+        private void PaintShortestPath()
+        {
+            NearestPointToMouse = new Ellipse
+            {
+                Width = BubbleSize,
+                Height = BubbleSize,
+                StrokeThickness = 1,
+                Stroke = new SolidColorBrush(Windows.UI.Colors.Black),
+                Fill = new SolidColorBrush(Windows.UI.Colors.Blue),
+                Visibility = Visibility.Collapsed
+            };
+
+            canvas.Children.Add(NearestPointToMouse);
+
+            NearestPointToMousePin = new Line
+            {
+                StrokeThickness = 1,
+                Stroke = new SolidColorBrush(Windows.UI.Colors.Black),
+                Visibility = Visibility.Collapsed
+            };
+
+            canvas.Children.Add(NearestPointToMousePin);
+        }
+
         private void Canvas_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             ScaleControlPoints();
@@ -455,12 +547,14 @@ namespace IlanCurves
         {
             if (MouseTrackingLineX != null)
             {
+                MouseTrackingLineX.Visibility = (TrackingMousePosition.X < graphRect.Left || TrackingMousePosition.X > graphRect.Right) ? Visibility.Collapsed : Visibility.Visible;
                 MouseTrackingLineX.X1 = TrackingMousePosition.X;
                 MouseTrackingLineX.X2 = TrackingMousePosition.X;
             }
 
             if (MouseTrackingLineY != null)
             {
+                MouseTrackingLineY.Visibility = (TrackingMousePosition.Y < graphRect.Top || TrackingMousePosition.Y > graphRect.Bottom) ? Visibility.Collapsed : Visibility.Visible;
                 MouseTrackingLineY.Y1 = TrackingMousePosition.Y;
                 MouseTrackingLineY.Y2 = TrackingMousePosition.Y;
             }
@@ -546,9 +640,42 @@ namespace IlanCurves
             }
         }
 
+        private void UpdateShortestPath()
+        {
+            var unscaledPosition = UnscalePoint(TrackingMousePosition);
+
+            var nearestPointToMouse = CurveFunctions.NearestPointOnCurve(unscaledPosition, ControlPoints.ToArray());
+
+            var scaledNearestPoint = ScaledPoint(nearestPointToMouse);
+
+            NearestPointToMouse.Margin =
+                    new Thickness(
+                        scaledNearestPoint.X - BubbleSize / 2,
+                        scaledNearestPoint.Y - BubbleSize / 2,
+                        0,
+                        0);
+            NearestPointToMouse.Visibility = Visibility.Visible;
+
+            var clippedLine = Clipping.ClipLineToRect(
+                    graphRect,
+                    TrackingMousePosition.X,
+                    TrackingMousePosition.Y,
+                    scaledNearestPoint.X,
+                    scaledNearestPoint.Y
+                );
+            NearestPointToMousePin.X1 = clippedLine.Item1;
+            NearestPointToMousePin.Y1 = clippedLine.Item2;
+            NearestPointToMousePin.X2 = clippedLine.Item3;
+            NearestPointToMousePin.Y2 = clippedLine.Item4;
+            NearestPointToMousePin.Visibility = Visibility.Visible;
+        }
+
         private void Canvas_PointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             TrackingMousePosition = e.GetCurrentPoint(canvas).Position;
+
+            var unscaledPosition = UnscalePoint(TrackingMousePosition);
+            diagnostics.Text = $"Mouse ({TrackingMousePosition.X:0.00}, {TrackingMousePosition.Y:0.00}) unscaled ({unscaledPosition.X:0.00}, {unscaledPosition.Y:0.00})";
 
             if (MouseTracking)
                 UpdateMouseTrackingLines();
@@ -558,6 +685,11 @@ namespace IlanCurves
 
             if (ShowMouseYIntercepts)
                 UpdateYIntercepts();
+
+            if (ShowShortestPath)
+                UpdateShortestPath();
+
+            UpdateShortestPath();
         }
     }
 }

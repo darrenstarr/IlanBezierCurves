@@ -5,11 +5,18 @@
     xmlns:local="using:IlanCurves"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
 
     <Grid>
-        <Canvas x:Name="canvas" SizeChanged="Canvas_SizeChanged" PointerMoved="Canvas_PointerMoved"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Canvas Grid.Row="1" x:Name="canvas" SizeChanged="Canvas_SizeChanged" PointerMoved="Canvas_PointerMoved"/>
+        <canvas:CanvasControl Grid.Row="1" PointerMoved="Canvas_PointerMoved"/>
+        <TextBlock x:Name="diagnostics" Grid.ColumnSpan="2" />
     </Grid>
 </UserControl>
